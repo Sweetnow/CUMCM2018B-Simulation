@@ -67,6 +67,10 @@ void rgv::update(cnc cnc_array[CNC_NUM])
     //
     //
     //
+    if (_material.is_init() && _pmsg->size() == 0)
+    {
+        std::cout << "cannot find cnc time:" << *_pclock << std::endl;
+    }
     if (_state == WAITING && _pmsg->size() > 0)
     {
         std::vector<msg_dst_pair> msg_with_dst;
@@ -87,6 +91,10 @@ void rgv::update(cnc cnc_array[CNC_NUM])
             if (tmp != msg_with_dst.cend())
             {
                 pnext_demand = &tmp->second;
+            }
+            else
+            {
+                std::cout << "cannot find cnc time:" << *_pclock << std::endl;
             }
         }
         else
@@ -255,8 +263,22 @@ bool rgv::compare(const msg_dst_pair & a, const msg_dst_pair & b)
 #ifdef MULTIPLE
     //priority: demand_type(perfer unloading) > distance > number of cnc(perfer odd number)
     //unloading half material should be judged specially
-    return a.second.cnc_demand > b.second.cnc_demand    //demand_type(perfer unloading)
-        || (a.second.cnc_demand == b.second.cnc_demand && a.first < b.first)    //distance
+    //return a.second.cnc_demand > b.second.cnc_demand    //demand_type(perfer unloading)
+    //    || (a.second.cnc_demand == b.second.cnc_demand && a.first < b.first)    //distance
+    //    || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num)    //number
+    //    || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num == b.second.cnc_num && a.second.cnc_type > b.second.cnc_type);
+
+    //priority: distance > demand_type(perfer unloading) > number of cnc(perfer odd number)
+    //unloading half material should be judged specially
+    //return a.first < b.first    //distance
+    //    || (a.first == b.first && a.second.cnc_demand > b.second.cnc_demand)    //demand_type(perfer unloading)
+    //    || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num)    //number
+    //    || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num == b.second.cnc_num && a.second.cnc_type > b.second.cnc_type);
+
+    //priority: distance > demand_type(perfer loading) > number of cnc(perfer odd number)
+    //unloading half material should be judged specially
+    return a.first < b.first    //distance
+        || (a.first == b.first && a.second.cnc_demand < b.second.cnc_demand)    //demand_type(perfer loading)
         || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num)    //number
         || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num == b.second.cnc_num && a.second.cnc_type > b.second.cnc_type);
 #else

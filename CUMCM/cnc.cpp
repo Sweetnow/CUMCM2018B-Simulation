@@ -17,6 +17,7 @@ void cnc::update()
     switch (_state)
     {
     case cnc::WORKING:
+
         if (*_pclock >= _stop)
         {
             _state = WAITING_UNLOAD;
@@ -37,6 +38,11 @@ void cnc::update()
                 (_material.get_state() == material::HALF ?
                     CNC_EVENT_TIME[SECOND_OF_PROCESSES] : CNC_EVENT_TIME[FIRST_OF_PROCESSES]));
             _stop = work + *_pclock;
+            if (rand() % 100 == 0)
+            {
+                break_down();
+                std::cout << _num << " break_down in " << *_pclock << std::endl;
+            }
         }
         break;
     case cnc::UNLOADING:
