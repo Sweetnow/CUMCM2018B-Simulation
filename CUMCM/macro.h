@@ -1,6 +1,9 @@
 #ifndef MACRO_H
 #define MACRO_H
 #include"time.h"
+
+//#define MULTIPLE    //situation 2 two process
+
 enum cnc_event
 {
     ONE_PROCESS,            //one process

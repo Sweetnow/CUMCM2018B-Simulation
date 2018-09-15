@@ -31,7 +31,7 @@ public:
     void load(material m);
     void break_down();
     material unload();
-    cnc(int num, time *pclock, std::vector<message> *pmsg);
+    cnc(int num, int type, time *pclock, std::vector<message> *pmsg);
     ~cnc();
 private:
     state _state = WAITING_LOAD;
@@ -40,6 +40,9 @@ private:
     time *_pclock;   //global clock
     std::vector<message> *_pmsg;
     int _num;
+    int _type;  //0-situation 1(only one process)
+                //1-situation 2(first process)
+                //2-situation 2(second process)
 };
 
 inline int get_pos(int num)

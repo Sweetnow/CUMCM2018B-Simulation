@@ -27,6 +27,7 @@ void rgv::update(cnc cnc_array[CNC_NUM])
         if (*_pclock >= _stop)
         {
             _state = WAITING;
+            _material = material(); //set _material null
         }
         break;
     case rgv::UNLOADING:
@@ -48,6 +49,7 @@ void rgv::update(cnc cnc_array[CNC_NUM])
         {
             ++_ripe;
             _state = WAITING;
+            _material = material(); //set _material null
         }
         break;
     default:
@@ -107,6 +109,8 @@ material rgv::load(int cnc_num)
 {
     _state = LOADING;
     _stop = *_pclock + CNC_EVENT_TIME[cnc_num % 2 == 1 ? ODD_LOAD : EVEN_LOAD];
+    _all_log[_material.get_id()].cnc_num = cnc_num;
+    _all_log[_material.get_id()].load_start = *_pclock;
     return _material;
 }
 
@@ -114,6 +118,7 @@ void rgv::unload(material m, int cnc_num)
 {
     _state = UNLOADING;
     _material = m;
+    _all_log[_material.get_id()].unload_start = *_pclock;
     _stop = *_pclock + CNC_EVENT_TIME[cnc_num % 2 == 1 ? ODD_UNLOAD : EVEN_UNLOAD];
 }
 
@@ -132,6 +137,22 @@ void rgv::move(int pos)
     _pos = pos;
 }
 
+void rgv::output_log(std::ostream & os) const
+{
+    using std::endl;
+    os << "material_id" << ','
+        << "cnc_num" << ','
+        << "load_start_time" << ','
+        << "unload_start_time" << endl;
+    for (const auto& one_log : _all_log)
+    {
+        os << one_log.first << ','
+            << one_log.second.cnc_num << ','
+            << one_log.second.load_start << ','
+            << one_log.second.unload_start << endl;
+    }
+}
+
 rgv::rgv(time * pclock, std::vector<message> *pmsg) :
     _pclock(pclock), _pmsg(pmsg)
 {
@@ -143,6 +164,9 @@ rgv::~rgv()
 
 bool rgv::compare(const msg_dst_pair & a, const msg_dst_pair & b)
 {
+#ifdef MULTIPLE
+
+#else
     //priority: demand_type(perfer loading) > distance > number of cnc(perfer odd number)
     return a.second.cnc_demand < b.second.cnc_demand || (a.second.cnc_demand == b.second.cnc_demand && a.first < b.first)
         || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num);
@@ -150,6 +174,8 @@ bool rgv::compare(const msg_dst_pair & a, const msg_dst_pair & b)
     //priority:  distance > number of cnc(perfer odd number)
     /*return (a.first < b.first)
         || (a.first == b.first && a.second.cnc_num < b.second.cnc_num);*/
+#endif // MULTIPLE
+
 }
 
 int rgv::get_distance(const message &msg) const

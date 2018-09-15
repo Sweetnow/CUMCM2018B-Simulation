@@ -1,7 +1,5 @@
 #include "time.h"
 
-
-
 time::time(int second, int minute, int hour) :
     _second(second), _minute(minute), _hour(hour)
 {

@@ -21,7 +21,7 @@ void cnc::update()
         {
             _state = WAITING_UNLOAD;
             //report
-            _pmsg->push_back({ _num, message::WAIT_UNLOADING });
+            _pmsg->push_back({ _num, _type, message::WAIT_UNLOADING });
         }
         break;
     case cnc::WAITING_LOAD:
@@ -42,16 +42,18 @@ void cnc::update()
     case cnc::UNLOADING:
         if (*_pclock >= _stop)
         {
+            _material = material(); //set _material null
             _state = WAITING_LOAD;
             //report
-            _pmsg->push_back({ _num, message::WAIT_LOADING });
+            _pmsg->push_back({ _num,_type, message::WAIT_LOADING });
         }
         break;
     case cnc::BROKEN:
         if (*_pclock >= _stop)
         {
+            _material = material(); //set _material null
             _state = WAITING_LOAD;
-            _pmsg->push_back({ _num, message::WAIT_LOADING });
+            _pmsg->push_back({ _num,_type, message::WAIT_LOADING });
             //report
         }
         break;
@@ -98,11 +100,11 @@ material cnc::unload()
     return _material;
 }
 
-cnc::cnc(int num, time *clock, std::vector<message> *pmsg) :
-    _pclock(clock), _pmsg(pmsg), _num(num)
+cnc::cnc(int num, int type, time *clock, std::vector<message> *pmsg) :
+    _pclock(clock), _pmsg(pmsg), _num(num), _type(type)
 {
     //init
-    _pmsg->push_back({ _num,message::WAIT_LOADING });
+    _pmsg->push_back({ _num, _type, message::WAIT_LOADING });
 }
 
 
