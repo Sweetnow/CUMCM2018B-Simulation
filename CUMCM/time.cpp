@@ -92,3 +92,17 @@ time time::operator++(int)
     *this = *this + time(1);
     return tmp;
 }
+
+std::ostream & operator<<(std::ostream & os, const time & t)
+{
+    os.fill('0');
+    os.width(2);
+    os << t.get_hour() << ':';
+    os.fill('0');
+    os.width(2);
+    os << t.get_minute() << ':';
+    os.fill('0');
+    os.width(2);
+    os << t.get_second();
+    return os;
+}

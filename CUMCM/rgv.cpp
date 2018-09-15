@@ -146,6 +146,10 @@ bool rgv::compare(const msg_dst_pair & a, const msg_dst_pair & b)
     //priority: demand_type(perfer loading) > distance > number of cnc(perfer odd number)
     return a.second.cnc_demand < b.second.cnc_demand || (a.second.cnc_demand == b.second.cnc_demand && a.first < b.first)
         || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num);
+
+    //priority:  distance > number of cnc(perfer odd number)
+    /*return (a.first < b.first)
+        || (a.first == b.first && a.second.cnc_num < b.second.cnc_num);*/
 }
 
 int rgv::get_distance(const message &msg) const

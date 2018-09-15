@@ -1,13 +1,13 @@
 #ifndef RGV_H
 #define RGV_H
 
+#include<cmath>
+#include<vector>
+#include<algorithm>
 #include"time.h"
 #include"material.h"
 #include"macro.h"
-#include<cmath>
-#include<vector>
 #include"message.h"
-#include<algorithm>
 #include"cnc.h"
 
 class rgv
