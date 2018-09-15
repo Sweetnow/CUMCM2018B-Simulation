@@ -57,6 +57,7 @@ int main()
     if (log_file.is_open())
     {
         r.output_log(log_file);
+        log_file.close();
     }
     else
     {

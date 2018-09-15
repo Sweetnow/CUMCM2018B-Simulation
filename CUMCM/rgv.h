@@ -41,8 +41,16 @@ private:
     struct log
     {
         int cnc_num = 0;
+#ifdef MULTIPLE
+        time load_raw_start = 0;
+        time unload_half_start = 0;
+        time load_half_start = 0;
+        time unload_pipe_start = 0;
+#else
         time load_start = 0;
         time unload_start = 0;
+#endif // MULTIPLE
+
     };
 
     static bool compare(const msg_dst_pair &a, const msg_dst_pair &b);
