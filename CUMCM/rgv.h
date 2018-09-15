@@ -22,6 +22,7 @@ public:
         WASHING
     };
 
+    int get_ripe_count() const;
     state get_state() const;
     void update(cnc cnc_array[CNC_NUM]);
     //assume that RGV is located in the correct position
@@ -44,6 +45,7 @@ private:
     time _stop;
     time *_pclock;
     std::vector<message> *_pmsg;
+    int _ripe = 0;
 };
 
 #endif // !RGV_H

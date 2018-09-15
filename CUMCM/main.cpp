@@ -4,7 +4,11 @@
 #include"macro.h"
 #include"cnc.h"
 #include"rgv.h"
+
 using std::vector;
+using std::cout;
+using std::endl;
+using std::cin;
 
 vector<message> msg;
 time clock(0, 0, 0);
@@ -24,5 +28,7 @@ int main()
         r.update(cnc_array);
         ++clock;
     }
+    cout << "8小时完成熟料数量："<<r.get_ripe_count() << endl;
+    cin.get();
     return 0;
 }

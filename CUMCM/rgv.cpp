@@ -1,6 +1,11 @@
 #include "rgv.h"
 
 
+int rgv::get_ripe_count() const
+{
+    return _ripe;
+}
+
 rgv::state rgv::get_state() const
 {
     return _state;
@@ -41,6 +46,7 @@ void rgv::update(cnc cnc_array[CNC_NUM])
     case rgv::WASHING:
         if (*_pclock >= _stop)
         {
+            ++_ripe;
             _state = WAITING;
         }
         break;
