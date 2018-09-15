@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2016
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CUMCM", "CUMCM\CUMCM.vcxproj", "{A40C7126-8266-4E45-B53B-C4E275186F9C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Debug|x64.ActiveCfg = Debug|x64
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Debug|x64.Build.0 = Debug|x64
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Debug|x86.ActiveCfg = Debug|Win32
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Debug|x86.Build.0 = Debug|Win32
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Release|x64.ActiveCfg = Release|x64
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Release|x64.Build.0 = Release|x64
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Release|x86.ActiveCfg = Release|Win32
+		{A40C7126-8266-4E45-B53B-C4E275186F9C}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C4A2CF2C-F742-4158-8F45-FE6A1B1C7561}
+	EndGlobalSection
+EndGlobal
