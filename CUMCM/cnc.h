@@ -42,4 +42,9 @@ private:
     int _num;
 };
 
+inline int get_pos(int num)
+{
+    return (num - 1) / 2;
+}
+
 #endif // !CNC_H

@@ -126,6 +126,7 @@
     <ClCompile Include="cnc.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material.cpp" />
+    <ClCompile Include="message.cpp" />
     <ClCompile Include="rgv.cpp" />
     <ClCompile Include="time.cpp" />
   </ItemGroup>

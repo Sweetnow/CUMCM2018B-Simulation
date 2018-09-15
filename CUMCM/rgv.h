@@ -7,6 +7,7 @@
 #include<cmath>
 #include<vector>
 #include"message.h"
+#include<algorithm>
 #include"cnc.h"
 
 class rgv
@@ -31,6 +32,9 @@ public:
     ~rgv();
 
 private:
+    using msg_dst_pair = std::pair<int, message>;
+    static bool compare(const msg_dst_pair &a, const msg_dst_pair &b);
+    int get_distance(const message &msg) const;
     state _state = WAITING;
     //      CNC2#  CNC4#  CNC6#  CNC8#
     //_pos    0      1      2      3

@@ -101,6 +101,8 @@ material cnc::unload()
 cnc::cnc(int num, time *clock, std::vector<message> *pmsg) :
     _pclock(clock), _pmsg(pmsg), _num(num)
 {
+    //init
+    _pmsg->push_back({ _num,message::WAIT_LOADING });
 }
 
 
