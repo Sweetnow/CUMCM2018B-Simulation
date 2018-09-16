@@ -38,11 +38,14 @@ void cnc::update()
                 (_material.get_state() == material::HALF ?
                     CNC_EVENT_TIME[SECOND_OF_PROCESSES] : CNC_EVENT_TIME[FIRST_OF_PROCESSES]));
             _stop = work + *_pclock;
+#ifdef BREAK_DOWN
             if (rand() % 100 == 0)
             {
                 break_down();
                 std::cout << _num << " break_down in " << *_pclock << std::endl;
             }
+#endif // BREAK_DOWN
+
         }
         break;
     case cnc::UNLOADING:

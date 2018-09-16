@@ -5,6 +5,7 @@
 #include"macro.h"
 #include"cnc.h"
 #include"rgv.h"
+#include<string>
 
 using std::vector;
 using std::cout;
@@ -42,6 +43,7 @@ cnc cnc_array[CNC_NUM] =
 
 int main()
 {
+    
     while (clock < MAX_TIME)
     {
         for (size_t i = 0; i < CNC_NUM; i++)
@@ -53,7 +55,15 @@ int main()
         ++clock;
     }
     cout << "8小时完成熟料数量：" << r.get_ripe_count() << endl;
-    std::ofstream log_file("log.csv");
+    std::string file_name = ".csv";
+#ifdef MULTIPLE
+    file_name = "_multiple" + file_name;
+#endif // MULTIPLE
+#ifdef BREAK_DOWN
+    file_name = "_bad" + file_name;
+#endif
+    file_name = "situation_3" + file_name;
+    std::ofstream log_file(file_name);
     if (log_file.is_open())
     {
         r.output_log(log_file);
