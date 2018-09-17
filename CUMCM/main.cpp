@@ -21,11 +21,10 @@ int main()
 {
     unsigned char best_code;
     int max_result = 0;
-    for (unsigned short c = 85; c <= 85; ++c)
+    for (unsigned short c = 81; c <= 81; ++c)
     {
         vector<message> msg;
         time clock(0, 0, 0);
-        rgv r(&clock, &msg);
 #ifdef MULTIPLE
         cnc cnc_array[CNC_NUM] =
         {
@@ -51,6 +50,7 @@ int main()
             {8,0,&clock,&msg},
         };
 #endif // MULTIPLE
+        rgv r(&clock, &msg, cnc_array);
         while (clock < MAX_TIME)
         {
             for (size_t i = 0; i < CNC_NUM; i++)
@@ -58,7 +58,7 @@ int main()
                 cnc_array[i].update();
             }
             //1% break down one cnc????
-            r.update(cnc_array);
+            r.update();
             ++clock;
         }
         if (r.get_ripe_count() > max_result)
@@ -70,7 +70,6 @@ int main()
 
     vector<message> msg;
     time clock(0, 0, 0);
-    rgv r(&clock, &msg);
 #ifdef MULTIPLE
     cnc cnc_array[CNC_NUM] =
     {
@@ -96,6 +95,7 @@ int main()
         {8,0,&clock,&msg},
     };
 #endif // MULTIPLE
+    rgv r(&clock, &msg,cnc_array);
     while (clock < MAX_TIME)
     {
         for (size_t i = 0; i < CNC_NUM; i++)
@@ -103,7 +103,7 @@ int main()
             cnc_array[i].update();
         }
         //1% break down one cnc????
-        r.update(cnc_array);
+        r.update();
         ++clock;
     }
 
@@ -115,7 +115,7 @@ int main()
 #ifdef BREAK_DOWN
     file_name = "_bad" + file_name;
 #endif
-    file_name = "situation_1" + file_name;
+    file_name = "situation_3" + file_name;
     std::ofstream log_file(file_name);
     if (log_file.is_open())
     {

@@ -23,6 +23,7 @@ public:
 
     state get_state() const;
     int get_num() const;
+    int get_type() const;
     void update();  //update cnc state per second
 
     // all control functions below assumes that 

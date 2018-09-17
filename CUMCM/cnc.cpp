@@ -12,6 +12,11 @@ int cnc::get_num() const
     return _num;
 }
 
+int cnc::get_type() const
+{
+    return _type;
+}
+
 void cnc::update()
 {
     switch (_state)

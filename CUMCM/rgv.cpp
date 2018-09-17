@@ -11,7 +11,7 @@ rgv::state rgv::get_state() const
     return _state;
 }
 
-void rgv::update(cnc cnc_array[CNC_NUM])
+void rgv::update()
 {
     switch (_state)
     {
@@ -81,7 +81,7 @@ void rgv::update(cnc cnc_array[CNC_NUM])
             msg_with_dst.push_back(std::make_pair(abs(get_pos(one.cnc_num) - _pos), one));
         }
         //sort by priority: demand_type(perfer loading) > distance > number of cnc(perfer odd number)
-        std::sort(msg_with_dst.begin(), msg_with_dst.end(), rgv::compare);
+        std::sort(msg_with_dst.begin(), msg_with_dst.end(), std::bind(rgv::compare, std::placeholders::_1, std::placeholders::_2, _pcnc_array));
 #ifdef MULTIPLE
         if (_material.is_init())    //holding a HALF material
         {
@@ -145,11 +145,11 @@ void rgv::update(cnc cnc_array[CNC_NUM])
 #else
                 _material = material(true);
 #endif // MULTIPLE
-                cnc_array[pnext_demand->cnc_num - 1].load(load(pnext_demand->cnc_num));
+                _pcnc_array[pnext_demand->cnc_num - 1].load(load(pnext_demand->cnc_num));
                 _pmsg->erase(std::find(_pmsg->begin(), _pmsg->end(), *pnext_demand));
                 break;
             case message::WAIT_UNLOADING:
-                unload(cnc_array[pnext_demand->cnc_num - 1].unload(), pnext_demand->cnc_num);
+                unload(_pcnc_array[pnext_demand->cnc_num - 1].unload(), pnext_demand->cnc_num);
                 _pmsg->erase(std::find(_pmsg->begin(), _pmsg->end(), *pnext_demand));
                 break;
             default:
@@ -192,7 +192,7 @@ void rgv::unload(material m, int cnc_num)
     if (_material.get_state() == material::HALF)
     {
         _all_log[_material.get_id()].unload_half_start = *_pclock;
-}
+    }
     else if (_material.get_state() == material::RIPE)
     {
         _all_log[_material.get_id()].unload_pipe_start = *_pclock;
@@ -249,8 +249,8 @@ void rgv::output_log(std::ostream & os) const
     }
 }
 
-rgv::rgv(time * pclock, std::vector<message> *pmsg) :
-    _pclock(pclock), _pmsg(pmsg)
+rgv::rgv(time * pclock, std::vector<message> *pmsg, cnc *pcnc) :
+    _pclock(pclock), _pmsg(pmsg), _pcnc_array(pcnc)
 {
 }
 
@@ -258,7 +258,7 @@ rgv::~rgv()
 {
 }
 
-bool rgv::compare(const msg_dst_pair & a, const msg_dst_pair & b)
+bool rgv::compare(const msg_dst_pair & a, const msg_dst_pair & b,const cnc * const pcnc_array)
 {
 #ifdef MULTIPLE
     //priority: demand_type(perfer unloading) > distance > number of cnc(perfer odd number)
@@ -275,12 +275,48 @@ bool rgv::compare(const msg_dst_pair & a, const msg_dst_pair & b)
     //    || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num)    //number
     //    || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num == b.second.cnc_num && a.second.cnc_type > b.second.cnc_type);
 
+#ifdef BREAK_DOWN
+    int bad[2] = { 0,0 };
+    for (size_t i = 0; i < CNC_NUM; i++)
+    {
+        if (pcnc_array[i].get_state() == cnc::BROKEN)
+            ++bad[pcnc_array[i].get_type() - 1];
+    }
+    if (bad[0] > bad[1])    //perfer loading RAW and unloading HALF
+    {
+        //priority: distance > demand_type(perfer loading) > number of cnc(perfer odd number)
+        //unloading half material should be judged specially
+        return a.first < b.first    //distance
+            || (a.first == b.first && a.second.cnc_demand < b.second.cnc_demand)    //demand_type(perfer loading)
+            || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num)    //number
+            || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num == b.second.cnc_num && a.second.cnc_type > b.second.cnc_type);
+    }
+    else if (bad[0] == bad[1])  //original
+    {
+        //priority: distance > demand_type(perfer loading) > number of cnc(perfer odd number)
+        //unloading half material should be judged specially
+        return a.first < b.first    //distance
+            || (a.first == b.first && a.second.cnc_demand < b.second.cnc_demand)    //demand_type(perfer loading)
+            || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num)    //number
+            || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num == b.second.cnc_num && a.second.cnc_type > b.second.cnc_type);
+    }
+    else    //perfer unloading RIPE
+    {
+        //priority: distance > demand_type(perfer unloading) > cnc_type (prefer unloading RIPE)> number of cnc(perfer odd number)
+        //unloading half material should be judged specially
+        return a.first < b.first    //distance
+            || (a.first == b.first && a.second.cnc_demand > b.second.cnc_demand)    //demand_type(perfer unloading)
+            || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_type > b.second.cnc_type )    //cnc_type
+            || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_type == b.second.cnc_type && a.second.cnc_num < b.second.cnc_num);
+    }
+#else
     //priority: distance > demand_type(perfer loading) > number of cnc(perfer odd number)
     //unloading half material should be judged specially
     return a.first < b.first    //distance
         || (a.first == b.first && a.second.cnc_demand < b.second.cnc_demand)    //demand_type(perfer loading)
         || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num < b.second.cnc_num)    //number
         || (a.second.cnc_demand == b.second.cnc_demand && a.first == b.first && a.second.cnc_num == b.second.cnc_num && a.second.cnc_type > b.second.cnc_type);
+#endif
 #else
     //priority: demand_type(perfer loading) > distance > number of cnc(perfer odd number)
     return a.second.cnc_demand < b.second.cnc_demand
